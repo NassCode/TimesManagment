@@ -198,7 +198,7 @@ const Tasks = ({
             <div className="notesSubmitContainer">
               <TextField
                 sx={{ mt: 1, mb: 1, width: 220, maxWidth: "100%" }}
-                label="Add a note"
+                label="Name the card"
                 variant="outlined"
                 value={newTask}
                 onChange={handleNewTask}
