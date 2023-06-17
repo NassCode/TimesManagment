@@ -1,41 +1,52 @@
 import { useState, useEffect } from "react";
 import Tasks from './components/Tasks'
-import { db, auth } from './firebaseConfig';
-import {
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "firebase/auth";
+import { db } from './firebaseConfig';
+
 
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore'
-import { LoginPage } from "./components/LoginPage";
-import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
+
 
 function App() {
   const [tasks, setTasks] = useState([])
-  const [wheels, setWheels] = useState([])
+  const [notes, setNotes] = useState([])
   const tasksCollectionRef = collection(db, 'tasks')
-  const wheelsCollectionRef = collection(db, 'wheels')
+  const notesCollectionRef = collection(db, 'notes')
 
-  const [user, setUser] = useState({});
+ 
 
-  onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser);
-  });
+  const [inProgress, setInProgress] = useState(false);
+
+  
 
 
   useEffect(() => {
-    const getUsers = async () => {
-      const data = await getDocs(tasksCollectionRef);
-      setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    };
-    const getWheels = async () => {
-      const data = await getDocs(wheelsCollectionRef);
-      setWheels(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    };
 
-    getUsers();
-    getWheels();
+    // check if data is already in local storage
+    const tasks = JSON.parse(localStorage.getItem('tasks'))
+    const notes = JSON.parse(localStorage.getItem('notes'))
+    
+    if(tasks && notes) {
+      setTasks(tasks)
+      setNotes(notes)
+    } else {
+      const getUsers = async () => {
+        const data = await getDocs(tasksCollectionRef);
+        // set local storage with data
+        localStorage.setItem('tasks', JSON.stringify(data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
+        setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      };
+      
+      const getNotes = async () => {
+        const data = await getDocs(notesCollectionRef);
+        // set local storage with data
+        localStorage.setItem('notes', JSON.stringify(data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
+        setNotes(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      };
+  
+      getUsers();
+      getNotes();
+    }
+
   }, []);
 
 
@@ -51,97 +62,160 @@ function App() {
                         date: String(task.date),
                         status: task.status,
                         type: task.type};
+    
+    setInProgress(true);
 
     await updateDoc(taskDoc, newFields);
    
     const getUsers = async () => {
       const data = await getDocs(tasksCollectionRef);
+      localStorage.setItem('tasks', JSON.stringify(data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
       setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      setInProgress(false);
     };
 
     getUsers();
     }
 
-    //update wheel
-  const updateWheel = async (task) => {
  
-    const taskDoc = doc(db, "wheels", task.id);
-    const newFields = { text: task.text,
-                        amount: task.amount,
-                        reserved: task.reserved,
-                        paid: task.paid,
-                        notes: task.notes,
-                        date: String(task.date),
-                        status: task.status,
-                        type: task.type};
-
-    await updateDoc(taskDoc, newFields);
-   
-    const getWheels = async () => {
-      const data = await getDocs(wheelsCollectionRef);
-      setWheels(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    };
-
-    getWheels();
-    }
 
   //handle reset
   const resetTask = async (task) => {
 
     const taskDoc = doc(db, "tasks", task.id);
-    const newFields = {status: 'done', type: 'onTime', reserved: false, paid: true, notes: '', amount: ''};
+    const newFields = {status: 'done'};
+    setInProgress(true);
+    await updateDoc(taskDoc, newFields);
+   
+    const getUsers = async () => {
+      const data = await getDocs(tasksCollectionRef);
+      localStorage.setItem('tasks', JSON.stringify(data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
+      setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      setInProgress(false);
+    };
+
+    getUsers();
+  }
+
+
+  // handle restore tasks
+  const restoreTask = async (task) => {
+
+    const taskDoc = doc(db, "tasks", task.id);
+    const newFields = {status: 'going'};
 
     await updateDoc(taskDoc, newFields);
    
     const getUsers = async () => {
       const data = await getDocs(tasksCollectionRef);
+      localStorage.setItem('tasks', JSON.stringify(data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
       setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     };
 
     getUsers();
   }
 
-  //handle resetWheels
-  const resetWheel = async (task) => {
 
-    const taskDoc = doc(db, "wheels", task.id);
-    const newFields = {status: 'done',  type: 'onTime', reserved: false, paid: true, notes: '', amount: ''};
-
-    await updateDoc(taskDoc, newFields);
-   
-    const getWheels = async () => {
-      const data = await getDocs(wheelsCollectionRef);
-      setWheels(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+  //refresh state from db
+  const refresh = async () => {
+    setInProgress(true);
+    const getUsers = async () => {
+      const data = await getDocs(tasksCollectionRef);
+      localStorage.setItem('tasks', JSON.stringify(data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
+      setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     };
 
-    getWheels();
+    
+
+
+
+    const getTasks = async () => {
+      const data = await getDocs(tasksCollectionRef);
+      localStorage.setItem('tasks', JSON.stringify(data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
+      setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      setInProgress(false);
+    };
+
+    const getNotes = async () => {
+      const data = await getDocs(notesCollectionRef);
+      localStorage.setItem('notes', JSON.stringify(data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
+      setNotes(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      setInProgress(false);
+    };
+
+    await getUsers();
+    await getTasks();
+    await getNotes();
+    
   }
 
+  async function deleteNote (id) {
+  
+    // replicate notes array by value
+    const newNotes = JSON.parse(JSON.stringify(notes))
+    // remove note from array
+    newNotes[0].notes.splice(id, 1)
+    // update state
+    setNotes(newNotes)
+    // update db
+    const taskDoc = doc(db, "notes", notes[0].id);
+    const newFields = {notes: newNotes[0].notes};
+    setInProgress(true);
+    await updateDoc(taskDoc, newFields);
+
+    // update state
+    const getNotes = async () => {
+      const data = await getDocs(notesCollectionRef);
+      localStorage.setItem('notes', JSON.stringify(data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
+      setNotes(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      setInProgress(false);
+    };
+
+    await getNotes();
+
+  }
+
+  async function addNote (text) {
+    // replicate notes array by value
+    const newNotes = JSON.parse(JSON.stringify(notes))
+    // add note to array
+    newNotes[0].notes.push(text)
+    // update state
+    setNotes(newNotes)
+    // update db
+    const taskDoc = doc(db, "notes", notes[0].id);
+    const newFields = {notes: newNotes[0].notes};
+    setInProgress(true);
+    await updateDoc(taskDoc, newFields);
+
+    // update state
+    const getNotes = async () => {
+      const data = await getDocs(notesCollectionRef);
+      localStorage.setItem('notes', JSON.stringify(data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
+      setNotes(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      setInProgress(false);
+    };
+
+    await getNotes();
+  }
+
+  //reload page after db update
+ 
+  async function hardRefresh() {
+    await refresh();
+    window.location.reload();
+  }
     
   
-  const login = async (e) => {
-    try {
-      const user = await signInWithEmailAndPassword(
-        auth,
-        e.email,
-        e.password
-      );
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+  
 
-  const logout = async () => {
-    await signOut(auth);
-  };
   
   return (
 
       <div className="container">
 
-       {user
-        ? <Tasks tasks={tasks} wheels={wheels} resetTask={resetTask} resetWheel={resetWheel} onEdit={updateTask} onWheelsEdit={updateWheel} logout={logout}/>
-        : <LoginPage login={login}/>}   
+       <Tasks inProgress={inProgress} tasks={tasks} resetTask={resetTask} restoreTask={restoreTask} onEdit={updateTask} refresh={refresh} hardRefresh={hardRefresh} notes={notes} deleteNote={deleteNote} addNote={addNote}/>
+          
                    
       </div>
   );

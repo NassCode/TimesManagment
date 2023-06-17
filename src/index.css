@@ -26,6 +26,7 @@ body {
   min-height: 300px;
   border: 1px solid steelblue;
   padding: 6px;
+  margin: 0 auto;
 
 
 }
@@ -78,3 +79,67 @@ body {
   
 
 }
+
+.optionsBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 9px;
+}
+
+.refreshBtn {
+  
+  margin-top: 10px;
+  margin-left: 40px;
+
+}
+
+.restoreBtn {
+  margin-top: 10px;
+  margin-left: 40px;
+}
+
+.noteBtn {
+  margin-top: 10px;
+  margin-left: 40px;
+}
+
+.moving-text:hover{
+  animation-play-state: paused;
+}
+
+/* The animation */
+@keyframes marquee{
+  0%{transform: translateX(100%);}
+  100%{transform: translateX(-100%);}
+}
+
+/* media query to enable animation for only those who want it */
+@media (prefers-reduced-motion: no-preference) {
+  .moving-text{
+      animation: marquee 15s linear infinite ;
+  }
+}
+
+.notesContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  gap: 10px 20px; 
+  row-gap: 10px;
+  column-gap: 20px;
+  padding: 9px;
+}
+
+.notesSubmitContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  gap: 10px 20px;
+  row-gap: 10px;
+  column-gap: 20px;
+  
+}
+

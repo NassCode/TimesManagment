@@ -8,6 +8,7 @@ import { OpenTimePicker } from "./OpenTimePicker";
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
+import BackspaceIcon from '@mui/icons-material/Backspace';
 
 
 const UpdateForm = ({ task, onEdit, afterAddClose, style }) => {
@@ -61,6 +62,21 @@ const UpdateForm = ({ task, onEdit, afterAddClose, style }) => {
     const setOpenTime = (event) => {
         setOTState(event);
         setDate(event);
+    }
+
+    function clearFields () {
+        setReChecked(false)
+        setPaidChecked(false)
+        setNotes('')
+        setAmount('')
+    }
+
+    function clearAmount () {
+        setAmount('')
+    }
+
+    function clearNotes () {
+        setNotes('')
     }
 
     const onSubmit = (e) => {
@@ -223,21 +239,40 @@ const UpdateForm = ({ task, onEdit, afterAddClose, style }) => {
                 handleOT={setOpenTime}
                 otState={otState}/>}
 
-                <div>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+
+                }}>
                 <TextField sx={{mt: 1, mb: 1}} label="Amount" onChange={handleAmount} value={amount}  type="number" InputLabelProps={{
                   shrink: true,
                 }}/>
 
+                <BackspaceIcon color="primary" onClick={clearAmount} />
+
                 </div>
 
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <TextField sx={{mt: 1, mb: 1}} label="Notes" variant="outlined" value={notes} onChange={handleNotes} multiline />
+
+                    <BackspaceIcon color="primary" onClick={clearNotes}/>
+                </div>
                 <div>
-                    <TextField sx={{mt: 1, mb: 1}} label="Notes" variant="outlined" value={notes} onChange={handleNotes} />
+                    <Button sx={{mr: 1}} type="submit" variant="contained" color="primary">
+                        Update
+                    </Button>
+                    <Button sx={{mr: 1}} variant="outlined" onClick={clearFields}>Clear</Button>
+                    <Button sx={{mr: 1}} variant="outlined" onClick={afterAddClose}>Close</Button>
                 </div>
                 
-                <Button sx={{mr: 1}} type="submit" variant="contained" color="primary">
-                    Update
-                </Button>
-                <Button variant="outlined" onClick={afterAddClose}>Close</Button>
+                
 
             </form>
         </Box>
