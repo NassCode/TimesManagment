@@ -264,7 +264,7 @@ const UpdateForm = ({ task, onEdit, afterAddClose, style }) => {
 
                     <BackspaceIcon color="primary" onClick={clearNotes}/>
                 </div>
-                <div>
+                <div style={{display: 'flex', flexDirection: 'row', gap: '5px', marginTop: '5px'}}>
                     <Button sx={{mr: 1}} type="submit" variant="contained" color="primary">
                         Update
                     </Button>

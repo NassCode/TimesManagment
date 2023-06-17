@@ -10,11 +10,12 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Box from "@mui/material/Box";
 import RestorePageIcon from "@mui/icons-material/RestorePage";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import ClearIcon from '@mui/icons-material/Clear';
-import Divider from '@mui/material/Divider';
+import ClearIcon from "@mui/icons-material/Clear";
+import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { TextField } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
 const style = {
   position: "absolute",
@@ -30,6 +31,8 @@ const style = {
 
 const Tasks = ({
   tasks,
+  addTask,
+  deleteTask,
   onEdit,
   resetTask,
   restoreTask,
@@ -38,14 +41,24 @@ const Tasks = ({
   inProgress,
   notes,
   deleteNote,
-  addNote
+  addNote,
 }) => {
   const [value, setValue] = useState(0);
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => {setOpen(false); setNewNote("")};
+  const handleClose = () => {
+    setOpen(false);
+    setNewNote("");
+  };
+  const [open2, setOpen2] = useState(false);
+  const handleOpen2 = () => setOpen2(true);
+  const handleClose2 = () => {
+    setOpen2(false);
+    setNewNote("");
+  };
   const [newNote, setNewNote] = useState("");
+  const [newTask, setNewTask] = useState("");
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -53,7 +66,11 @@ const Tasks = ({
 
   const handleNewNote = (e) => {
     setNewNote(e.target.value);
-    };
+  };
+
+  const handleNewTask = (e) => {
+    setNewTask(e.target.value);
+  };
 
   return (
     <div>
@@ -69,8 +86,6 @@ const Tasks = ({
             onEdit={onEdit}
           />
         ))}
-
-      
 
       {notes.length > 0 && (
         <div className="notes">
@@ -94,12 +109,20 @@ const Tasks = ({
         </Box>
       )}
 
-      <Tabs value={value} onChange={handleChange}>
-        <Tab icon={<SportsEsportsIcon />} />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          gap: "5px",
+          margin: "8px 0",
+        }}
+      >
         <CachedIcon onClick={refresh} className="refreshBtn" />
         <RestorePageIcon onClick={hardRefresh} className="restoreBtn" />
         <NoteAddIcon className="noteBtn" onClick={handleOpen} />
-      </Tabs>
+        <AddIcon className="noteBtn" onClick={handleOpen2} />
+      </div>
 
       <Modal
         open={open}
@@ -111,33 +134,92 @@ const Tasks = ({
           <div>
             {notes.length > 0 &&
               notes[0].notes.map((note, i) => (
-                <div >
-                    <div className="notesContainer">
+                <div key={i}>
+                  <div className="notesContainer">
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        {note}
+                      {note}
                     </Typography>
                     <ClearIcon onClick={() => deleteNote(i)} />
-                    </div>
-                    <Divider />
-                    
+                  </div>
+                  <Divider />
                 </div>
-                
-                ))}
-                
-                <div className="notesSubmitContainer">
-                    
-                    <TextField sx={{mt: 1, mb: 1,width: 220, maxWidth: '100%'}} label="Add a note" variant="outlined" value={newNote} onChange={handleNewNote} multiline />
-                    
-                   
-                   <Button disabled={(newNote.length === 0 ? true: false)} variant="outlined" color="success" onClick={() => {
-                        addNote(newNote);
-                        setNewNote("");                       
-                    }}>Add</Button>
-                    
-                   
-                   
+              ))}
+
+            <div className="notesSubmitContainer">
+              <TextField
+                sx={{ mt: 1, mb: 1, width: 220, maxWidth: "100%" }}
+                label="Add a note"
+                variant="outlined"
+                value={newNote}
+                onChange={handleNewNote}
+                multiline
+              />
+
+              <Button
+                disabled={newNote.length === 0 ? true : false}
+                variant="outlined"
+                color="success"
+                onClick={() => {
+                  addNote(newNote);
+                  setNewNote("");
+                }}
+              >
+                Add
+              </Button>
+            </div>
+            <Button variant="outlined" color="error" onClick={handleClose}>
+              Close
+            </Button>
+          </div>
+        </Box>
+      </Modal>
+
+      <Modal
+        open={open2}
+        onClose={handleClose2}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div>
+            {tasks.length > 0 &&
+              tasks.map((task, i) => (
+                <div key={i}>
+                  <div className="notesContainer">
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                      {task.text}
+                    </Typography>
+                    <ClearIcon onClick={() => deleteTask(task.id)} />
+                  </div>
+                  <Divider />
                 </div>
-                <Button variant="outlined" color="error" onClick={handleClose}>Close</Button>
+              ))}
+
+            <div className="notesSubmitContainer">
+              <TextField
+                sx={{ mt: 1, mb: 1, width: 220, maxWidth: "100%" }}
+                label="Add a note"
+                variant="outlined"
+                value={newTask}
+                onChange={handleNewTask}
+                multiline
+              />
+
+              <Button
+                disabled={newTask.length === 0 ? true : false}
+                variant="outlined"
+                color="success"
+                onClick={() => {
+                  addTask(newTask);
+                  setNewTask("");
+                }}
+              >
+                Add
+              </Button>
+            </div>
+            <Button variant="outlined" color="error" onClick={handleClose2}>
+              Close
+            </Button>
           </div>
         </Box>
       </Modal>

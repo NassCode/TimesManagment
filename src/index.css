@@ -23,12 +23,21 @@ body {
 .container {
   max-width: 500px;
   overflow: auto;
-  min-height: 300px;
   border: 1px solid steelblue;
   padding: 6px;
   margin: 0 auto;
 
 
+}
+
+.noTasks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 10px;
+  margin: 20px 0;
 }
 
 
